@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace BaseCamp
+namespace HomeTask1
 {
     class Program
     {
@@ -200,4 +200,5 @@ namespace BaseCamp
         }
     }
 }
+
 
