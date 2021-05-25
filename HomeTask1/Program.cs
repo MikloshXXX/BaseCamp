@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace HomeTask1
 {
@@ -8,6 +10,13 @@ namespace HomeTask1
         static void Main(string[] args)
         {
 
+        }
+        private static void ShowArray(int[] array)
+        {
+            foreach(int i in array)
+            {
+                Console.WriteLine(i + ",");
+            }
         }
         //По результатам семестра в 1-А классе 10 отличником, 14 хорошистов, 4 троечника.В 1-Б - 8 отличников,
         //12 хорошистов, 5 троечников. 1-В - 12 отличников, 7 хорошистов, 8 троечников.
@@ -100,6 +109,11 @@ namespace HomeTask1
             }
             return null;
         }
+        private static int[] FindUniqueNumbersLINQ(int[] initial)
+        {
+            return null;
+        }
+
         //Написать метод который сможет транспонировать матрицу.
         private static int[,] TransposeMatirx(int[,] initial)
         {
