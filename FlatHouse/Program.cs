@@ -13,6 +13,7 @@ namespace FlatHouse
     {
         public static void Main(string[] args)
         {
+            DAOFlat dao = new DAOFlat();
             CreateHostBuilder(args).Build().Run();
         }
 

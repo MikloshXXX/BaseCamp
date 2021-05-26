@@ -7,14 +7,9 @@ namespace FlatHouse
 {
     public class FlatJSON
     {
-        public int FlatNumber { get; set; }
+        public int ApartmentNumber { get; set; }
         public float FloorArea { get; set; }
+        public bool IsOccupied { get; set; }
         public string ResidentName { get; set; }
-        public FlatJSON(int flatNumber, float floorArea, string residentName)
-        {
-            FlatNumber = flatNumber;
-            FloorArea = floorArea;
-            ResidentName = residentName;
-        }
     }
 }
