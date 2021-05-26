@@ -11,45 +11,45 @@ namespace FlatHouse.Controllers
     [ApiController]
     public class FlatController : ControllerBase
     {
-        private static List<Flat> flatHouse = new List<Flat>
-        {
-            new Flat(25.5f),
-            new Flat(33f, "Mykola"),
-            new Flat(47.7f, "Pavel"),
-            new Flat(54f)
-        };
+        private FlatDAO dao = new FlatDAO();
 
         [HttpGet]
         public IActionResult GetFlats()
         {
-            return Ok(flatHouse);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetFlat([FromRoute]int id)
-        {
-            return Ok(flatHouse[id]);
+            return Ok(dao.Get());
         }
 
         [HttpPost]
-        public IActionResult CreateFlat([FromBody]float flatArea)
+        public IActionResult CreateFlat([FromBody] FlatJSON flat)
         {
-            flatHouse.Add(new Flat(flatArea));
+            dao.Insert(new Flat(5, 55));
+            dao.Insert(new Flat(6, 105,"Whis"));
+            if (flat.ResidentName == null)
+            {
+                dao.Insert(new Flat(flat.FlatNumber, flat.FloorArea));
+                return Ok();
+            }
+           dao.Insert(new Flat(flat.FlatNumber, flat.FloorArea, flat.ResidentName));
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public IActionResult ChangeFlat([FromRoute]int id, [FromBody] float floatArea)
+        [HttpGet("{id}")]
+        public IActionResult GetFlat([FromRoute] int id)
         {
-            flatHouse[id] = new Flat(floatArea);
-            return Ok();
+            return Ok(dao.Get().Find(_ => _.FlatNumber == id));
         }
-        
-        [HttpDelete("{id}")]
-        public IActionResult DeleteFlat([FromRoute]int id)
+
+        [HttpPut("{id}")]
+        public IActionResult ChangeFlat([FromRoute] int id, [FromBody] FlatJSON flat)
         {
-            flatHouse.RemoveAt(id);
-            return Ok();
+            Flat realFlat = flat.ResidentName == null ? new Flat(flat.FlatNumber, flat.FloorArea) : new Flat(flat.FlatNumber, flat.FloorArea, flat.ResidentName);
+            return Ok(dao.Update(id, realFlat));
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteFlat([FromRoute] int id)
+        {
+            return Ok(dao.Delete(id));
         }
     }
 }
