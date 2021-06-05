@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace ApartmentBuilding.Models
+namespace ApartmentBuilding.Core.Models
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace ApartmentBuilding.Models
         /// <param name="apartmentNumber">Apartment number.</param>
         /// <param name="floorArea">Floor area.</param>
         /// /// <param name="residentID">Resident`s ID who lives in this apartment.</param>
-        public Flat(int apartmentNumber, float floorArea, int? residentID = null)
+        public Flat(int apartmentNumber = 0, float floorArea = 0, int? residentID = null)
         {
             this.ApartmentNumber = apartmentNumber;
             this.FloorArea = floorArea;
@@ -35,28 +35,28 @@ namespace ApartmentBuilding.Models
         }
 
         /// <summary>
-        /// Gets property that contains apartment number in an apartment building.
+        /// Gets or sets property that contains apartment number in an apartment building.
         /// </summary>
-        public int ApartmentNumber { get; private set; }
+        public int ApartmentNumber { get; set; }
 
         /// <summary>
-        /// Gets property that contains floor area of an apartments.
+        /// Gets or sets property that contains floor area of an apartments.
         /// </summary>
-        public float FloorArea { get; private set; }
+        public float FloorArea { get; set; }
 
         /// <summary>
-        /// Gets property that contains the rent for the current apartments.
+        /// Gets or sets property that contains the rent for the current apartments.
         /// </summary>
-        public float Rent { get; private set; }
+        public float Rent { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether someone lives in the apartment.
+        /// Gets or sets a value indicating whether someone lives in the apartment.
         /// </summary>
-        public bool IsOccupied { get; private set; }
+        public bool IsOccupied { get; set; }
 
         /// <summary>
-        /// Gets property that contains resident who lives in this apartments.
+        /// Gets or sets property that contains resident who lives in this apartments.
         /// </summary>
-        public int? ResidentID { get; private set; }
+        public int? ResidentID { get; set; }
     }
 }

@@ -2,14 +2,15 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace ApartmentBuilding.API
+namespace ApartmentBuilding.Data
 {
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
-    using ApartmentBuilding.Models;
+    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.Core.Repositories;
     using MySqlConnector;
 
     /// <summary>
@@ -43,7 +44,7 @@ namespace ApartmentBuilding.API
                 string sql = "INSERT INTO `flats`(`apartmentNumber`, `floorArea`, `residentID`) VALUES (@apartmentNumber,@floorArea,@residentID)";
                 this.cmd.CommandText = sql;
                 MySqlParameter aptNum = new MySqlParameter("@apartmentNumber", MySqlDbType.Int32);
-                aptNum.Value = entity.ApartmentNumber;
+                aptNum.Value = GetMaxId();
                 this.cmd.Parameters.Add(aptNum);
                 MySqlParameter flArea = new MySqlParameter("@floorArea", MySqlDbType.Float);
                 flArea.Value = entity.FloorArea;
@@ -155,7 +156,7 @@ namespace ApartmentBuilding.API
                     "`floorArea` = @floorArea, `residentID` = @residentID WHERE `apartmentNumber` = @aptNum";
                 this.cmd.CommandText = sql;
                 MySqlParameter aptNum = new MySqlParameter("@aptNum", MySqlDbType.Int32);
-                aptNum.Value = entity.ApartmentNumber;
+                aptNum.Value = id;
                 MySqlParameter floorArea = new MySqlParameter("@floorArea", MySqlDbType.Float);
                 floorArea.Value = entity.FloorArea;
                 MySqlParameter residentName = new MySqlParameter("@residentID", MySqlDbType.Int32);
@@ -169,6 +170,27 @@ namespace ApartmentBuilding.API
             catch
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns an ID for a new apartment.
+        /// </summary>
+        /// <returns>New ID.</returns>
+        private int GetMaxId()
+        {
+            MySqlCommand cmdHelper = new MySqlCommand();
+            cmdHelper.Connection = this.dbConnection.GetConnection();
+            cmdHelper.CommandText = "SELECT MAX(apartmentNumber) as max_id FROM flats";
+            using (DbDataReader reader = cmdHelper.ExecuteReader())
+            {
+                int maxId = 0;
+                while (reader.Read())
+                {
+                    int currentIDIndex = reader.GetOrdinal("max_id");
+                    maxId = reader.GetInt32(currentIDIndex) + 1;
+                }
+                return maxId;
             }
         }
     }

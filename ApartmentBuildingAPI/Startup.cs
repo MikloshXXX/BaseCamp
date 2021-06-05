@@ -9,7 +9,9 @@ namespace ApartmentBuilding.API
     using System.Linq;
     using System.Threading.Tasks;
     using ApartmentBuilding.API;
-    using ApartmentBuilding.Models;
+    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.Core.Repositories;
+    using ApartmentBuilding.Data;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpsPolicy;

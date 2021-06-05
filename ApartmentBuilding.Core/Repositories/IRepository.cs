@@ -2,12 +2,13 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace ApartmentBuilding.API
+namespace ApartmentBuilding.Core.Repositories
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using ApartmentBuilding.Core.Models;
 
     /// <summary>
     /// Class that implements the repository pattern.

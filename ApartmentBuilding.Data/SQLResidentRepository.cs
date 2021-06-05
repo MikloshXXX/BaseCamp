@@ -2,14 +2,15 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace ApartmentBuilding.API
+namespace ApartmentBuilding.Data
 {
     using System;
     using System.Collections.Generic;
     using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
-    using ApartmentBuilding.Models;
+    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.Core.Repositories;
     using MySqlConnector;
 
     /// <summary>
@@ -38,12 +39,13 @@ namespace ApartmentBuilding.API
         {
             try
             {
+                int currentID = GetMaxId();
                 this.cmd = new MySqlCommand();
                 this.cmd.Connection = this.dbConnection.GetConnection();
                 string sql = "INSERT INTO `residents`(`ID`, `name`) VALUES (@ID,@name)";
                 this.cmd.CommandText = sql;
                 MySqlParameter id = new MySqlParameter("@ID", MySqlDbType.Int32);
-                id.Value = entity.ID;
+                id.Value = currentID;
                 this.cmd.Parameters.Add(id);
                 MySqlParameter name = new MySqlParameter("@name", MySqlDbType.VarChar);
                 name.Value = entity.Name;
@@ -51,7 +53,7 @@ namespace ApartmentBuilding.API
                 this.cmd.ExecuteNonQuery();
                 return true;
             }
-            catch
+            catch (NullReferenceException)
             {
                 return false;
             }
@@ -124,9 +126,9 @@ namespace ApartmentBuilding.API
                             }
                         }
                     }
-
-                    return residents;
                 }
+
+                return residents;
             }
             catch
             {
@@ -157,10 +159,10 @@ namespace ApartmentBuilding.API
                 this.cmd = new MySqlCommand();
                 this.cmd.Connection = this.dbConnection.GetConnection();
                 string sql = "UPDATE `residents` SET " +
-                    "`ID` = @id, `name` = @name WHERE `ID` = @id";
+                    "`name` = @name WHERE `ID` = @id";
                 this.cmd.CommandText = sql;
                 MySqlParameter idNum = new MySqlParameter("@id", MySqlDbType.Int32);
-                idNum.Value = entity.ID;
+                idNum.Value = id;
                 MySqlParameter name = new MySqlParameter("@name", MySqlDbType.VarChar);
                 name.Value = entity.Name;
                 this.cmd.Parameters.Add(idNum);
@@ -171,6 +173,27 @@ namespace ApartmentBuilding.API
             catch
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns an ID for a new resident.
+        /// </summary>
+        /// <returns>New ID.</returns>
+        private int GetMaxId()
+        {
+            MySqlCommand cmdHelper = new MySqlCommand();
+            cmdHelper.Connection = this.dbConnection.GetConnection();
+            cmdHelper.CommandText = "SELECT MAX(ID) as max_id FROM residents";
+            using (DbDataReader reader = cmdHelper.ExecuteReader())
+            {
+                int maxId = 0;
+                while (reader.Read())
+                {
+                    int currentIDIndex = reader.GetOrdinal("max_id");
+                    maxId = reader.GetInt32(currentIDIndex) + 1;
+                }
+                return maxId;
             }
         }
     }

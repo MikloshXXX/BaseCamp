@@ -8,7 +8,9 @@ namespace ApartmentBuilding.API.Controllers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using ApartmentBuilding.Models;
+    using ApartmentBuilding.API.Requests;
+    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.Core.Repositories;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -57,9 +59,9 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="flat">Apartment.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] FlatJSON flat)
+        public IActionResult Post([FromBody] FlatRequest flat)
         {
-            return this.Ok(this.repository.Create(new Flat(flat.ApartmentNumber, flat.FloorArea, flat.ResidentID)));
+            return this.Ok(this.repository.Create(flat.ToModel()));
         }
 
         /// <summary>
@@ -69,9 +71,9 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="flat">New apartment.</param>
         /// <returns>Sucess of the opartion.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] FlatJSON flat)
+        public IActionResult Put(int id, [FromBody] FlatRequest flat)
         {
-            return this.Ok(this.repository.Update(id, new Flat(flat.ApartmentNumber, flat.FloorArea, flat.ResidentID)));
+            return this.Ok(this.repository.Update(id, flat.ToModel()));
         }
 
         /// <summary>

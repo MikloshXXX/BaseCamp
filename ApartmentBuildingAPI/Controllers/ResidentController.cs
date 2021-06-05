@@ -8,7 +8,10 @@ namespace ApartmentBuilding.API.Controllers
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using ApartmentBuilding.Models;
+    using ApartmentBuilding.API.Requests;
+    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.Core.Repositories;
+    using ApartmentBuilding.Data;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +46,7 @@ namespace ApartmentBuilding.API.Controllers
             return this.Ok(this.repository.Get());
         }
 
+
         /// <summary>
         /// Returns specific resident entity from the repository.
         /// </summary>
@@ -60,9 +64,9 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="resident">Resident.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] ResidentJSON resident)
+        public IActionResult Post([FromBody] ResidentRequest resident)
         {
-            return this.Ok(this.repository.Create(new Resident(resident.ID, resident.Name)));
+            return this.Ok(this.repository.Create(resident.ToModel()));
         }
 
         /// <summary>
@@ -72,9 +76,9 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="resident">New resident.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] ResidentJSON resident)
+        public IActionResult Put(int id, [FromBody] ResidentRequest resident)
         {
-            return this.Ok(this.repository.Update(id, new Resident(resident.ID, resident.Name)));
+            return this.Ok(this.repository.Update(id, resident.ToModel()));
         }
 
         /// <summary>

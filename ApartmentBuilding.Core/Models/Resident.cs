@@ -2,7 +2,7 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
-namespace ApartmentBuilding.Models
+namespace ApartmentBuilding.Core.Models
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +20,7 @@ namespace ApartmentBuilding.Models
         /// <param name="iD">Resident's ID.</param>
         /// <param name="name">Resident's name.</param>
         /// <param name="flats">List of flats where the resident lives.</param>
-        public Resident(int iD, string name, List<Flat> flats = null)
+        public Resident(int iD = 0, string name = "", List<Flat> flats = null)
         {
             this.ID = iD;
             this.Name = name;
@@ -35,18 +35,18 @@ namespace ApartmentBuilding.Models
         }
 
         /// <summary>
-        /// Gets property that contains ID of the resident.
+        /// Gets or sets property that contains ID of the resident.
         /// </summary>
-        public int ID { get; private set; }
+        public int ID { get; set; }
 
         /// <summary>
-        /// Gets property that contains name of the resident.
+        /// Gets or sets property that contains name of the resident.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets property that contains all apartments where resident lives.
+        /// Gets or sets property that contains all apartments where resident lives.
         /// </summary>
-        public List<Flat> Flats { get; private set; }
+        public List<Flat> Flats { get; set; }
     }
 }

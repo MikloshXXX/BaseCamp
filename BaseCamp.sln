@@ -3,14 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApartmentBuildingAPI", "ApartmentBuildingAPI\ApartmentBuildingAPI.csproj", "{9B82BA0E-8062-4258-8251-B10586EE60B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApartmentBuilding.API", "ApartmentBuildingAPI\ApartmentBuilding.API.csproj", "{9B82BA0E-8062-4258-8251-B10586EE60B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{34883363-41E8-4965-906A-6590D1B9859E}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		..\..\StyleCopRules.ruleset = ..\..\StyleCopRules.ruleset
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuildingModels", "ApartmentBuildingModels\ApartmentBuildingModels.csproj", "{680A4A3D-8DA6-442A-AC30-5A6A5886BDF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuilding.Core", "ApartmentBuilding.Core\ApartmentBuilding.Core.csproj", "{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuilding.Data", "ApartmentBuilding.Data\ApartmentBuilding.Data.csproj", "{8E7BD049-1753-4E8E-9902-31FA004113DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +25,14 @@ Global
 		{9B82BA0E-8062-4258-8251-B10586EE60B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B82BA0E-8062-4258-8251-B10586EE60B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B82BA0E-8062-4258-8251-B10586EE60B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{680A4A3D-8DA6-442A-AC30-5A6A5886BDF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{680A4A3D-8DA6-442A-AC30-5A6A5886BDF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{680A4A3D-8DA6-442A-AC30-5A6A5886BDF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{680A4A3D-8DA6-442A-AC30-5A6A5886BDF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
