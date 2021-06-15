@@ -20,33 +20,32 @@ namespace ApartmentBuilding.Core.Models
         /// <param name="iD">Resident's ID.</param>
         /// <param name="name">Resident's name.</param>
         /// <param name="flats">List of flats where the resident lives.</param>
-        public Resident(int iD = 0, string name = "", List<Flat> flats = null)
+        public Resident(int iD = 0, string name = "", string password = "")
         {
             this.ID = iD;
             this.Name = name;
-            if (flats != null)
-            {
-                this.Flats = flats;
-            }
-            else
-            {
-                this.Flats = new List<Flat>();
-            }
+            this.Password = password;
+            this.Flats = new List<Flat>();
         }
 
         /// <summary>
-        /// Gets or sets property that contains ID of the resident.
+        /// Gets or sets property that contains an ID of a resident.
         /// </summary>
         public int ID { get; set; }
 
         /// <summary>
-        /// Gets or sets property that contains name of the resident.
+        /// Gets or sets property that contains a name of a resident.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets property that contains all apartments where resident lives.
+        /// Gets or sets property that contains a password of a resident.
         /// </summary>
+        public string Password { get; set; }
+
+        ///// <summary>
+        ///// Gets or sets property that contains all apartments where resident lives.
+        ///// </summary>
         public List<Flat> Flats { get; set; }
     }
 }

@@ -20,28 +20,28 @@ namespace ApartmentBuilding.Core.Repositories
         /// Method returns list of elements in the collection.
         /// </summary>
         /// <returns>Collection of elements.</returns>
-        public List<T> Get();
+        public Task<IEnumerable<T>> Get();
 
         /// <summary>
         /// Method returns specific element by its ID.
         /// </summary>
         /// <param name="id">ID of specific element.</param>
         /// <returns>Specific element by its ID.</returns>
-        public T GetByID(int id);
+        public Task<T> GetByID(int id);
 
         /// <summary>
         /// Method for creating an entity and add it to the collection.
         /// </summary>
         /// <param name="entity">Created entity.</param>
         /// <returns>Succes of the operation.</returns>
-        public bool Create(T entity);
+        public Task<bool> Create(T entity);
 
         /// <summary>
         /// Method for deleting an entity from the collection by ID.
         /// </summary>
         /// <param name="id">ID of deleting element.</param>
         /// <returns>Succes of the operation.</returns>
-        public bool Delete(int id);
+        public Task<bool> Delete(int id);
 
         /// <summary>
         /// Method for updating an specific element from the collection.
@@ -49,6 +49,6 @@ namespace ApartmentBuilding.Core.Repositories
         /// <param name="id">ID of updating entity.</param>
         /// <param name="entity">New entity.</param>
         /// <returns>Succes of the operation.</returns>
-        public bool Update(int id, T entity);
+        public Task<bool> Update(int id, T entity);
     }
 }

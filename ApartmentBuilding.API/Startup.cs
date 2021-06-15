@@ -12,6 +12,8 @@ namespace ApartmentBuilding.API
     using ApartmentBuilding.Core.Models;
     using ApartmentBuilding.Core.Repositories;
     using ApartmentBuilding.Data;
+    using AutoMapper;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpsPolicy;
@@ -47,8 +49,10 @@ namespace ApartmentBuilding.API
         /// <param name="services">Services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IRepository<Flat>, SQLFlatRepository>();
+            services.AddScoped<IRepository<Flat>, SQLApartmentRepository>();
             services.AddScoped<IRepository<Resident>, SQLResidentRepository>();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddControllersWithViews();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -72,6 +76,7 @@ namespace ApartmentBuilding.API
 
             app.UseHttpsRedirection();
 
+            // app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();

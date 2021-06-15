@@ -1,4 +1,4 @@
-﻿// <copyright file="FlatController.cs" company="PlaceholderCompany">
+﻿// <copyright file="FlatsController.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
@@ -9,8 +9,10 @@ namespace ApartmentBuilding.API.Controllers
     using System.Linq;
     using System.Threading.Tasks;
     using ApartmentBuilding.API.Requests;
+    using ApartmentBuilding.API.Responses;
     using ApartmentBuilding.Core.Models;
     using ApartmentBuilding.Core.Repositories;
+    using AutoMapper;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -19,17 +21,20 @@ namespace ApartmentBuilding.API.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class FlatController : ControllerBase
+    public class FlatsController : ControllerBase
     {
         private readonly IRepository<Flat> repository;
+        private readonly IMapper mapper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FlatController"/> class.
+        /// Initializes a new instance of the <see cref="FlatsController"/> class.
         /// </summary>
-        /// <param name="repository">?.</param>
-        public FlatController(IRepository<Flat> repository)
+        /// <param name="repository">repo param.</param>
+        /// /// <param name="mapper">mapper param.</param>
+        public FlatsController(IRepository<Flat> repository, IMapper mapper)
         {
             this.repository = repository;
+            this.mapper = mapper;
         }
 
         /// <summary>
@@ -37,9 +42,11 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <returns>List of apartments.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return this.Ok(this.repository.Get());
+            var models = await this.repository.Get();
+            var result = models.ToList().Select(_ => this.mapper.Map<FlatResponse>(_));
+            return this.Ok(result.ToList());
         }
 
         /// <summary>
@@ -48,9 +55,10 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="id">ID of the apartment.</param>
         /// <returns>Apartment.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return this.Ok(this.repository.Get().Find(_ => _.ApartmentNumber == id));
+            var result = await this.repository.GetByID(id);
+            return this.Ok(this.mapper.Map<FlatResponse>(result));
         }
 
         /// <summary>
@@ -59,9 +67,15 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="flat">Apartment.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] FlatRequest flat)
+        public async Task<IActionResult> Post([FromBody] FlatRequest flat)
         {
-            return this.Ok(this.repository.Create(flat.ToModel()));
+            if (flat.Validate())
+            {
+                var model = this.mapper.Map<Flat>(flat);
+                return this.Ok(await this.repository.Create(model));
+            }
+
+            return this.ValidationProblem();
         }
 
         /// <summary>
@@ -71,9 +85,15 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="flat">New apartment.</param>
         /// <returns>Sucess of the opartion.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] FlatRequest flat)
+        public async Task<IActionResult> Put(int id, [FromBody] FlatRequest flat)
         {
-            return this.Ok(this.repository.Update(id, flat.ToModel()));
+            if (flat.Validate())
+            {
+                var model = this.mapper.Map<Flat>(flat);
+                return this.Ok(await this.repository.Update(id, model));
+            }
+
+            return this.ValidationProblem();
         }
 
         /// <summary>
@@ -82,9 +102,9 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="id">ID of the deleting apartment.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpDelete("{id}")]
-        public IActionResult DeleteFlat([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            return this.Ok(this.repository.Delete(id));
+            return this.Ok(await this.repository.Delete(id));
         }
     }
 }

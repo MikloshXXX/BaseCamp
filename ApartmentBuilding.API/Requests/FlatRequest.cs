@@ -8,17 +8,32 @@ namespace ApartmentBuilding.API.Requests
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using ApartmentBuilding.Core.Models;
+    using ApartmentBuilding.API.Validators;
 
     /// <summary>
-    /// FlatRequest class.
+    /// Flat request model class.
     /// </summary>
     public class FlatRequest
     {
+        private readonly FlatRequestValidator validator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlatRequest"/> class.
+        /// </summary>
+        public FlatRequest()
+        {
+            this.validator = new FlatRequestValidator();
+        }
+
         /// <summary>
         /// Gets or sets property that contains floor area of an apartments.
         /// </summary>
-        public int FloorArea { get; set; }
+        public float FloorArea { get; set; }
+
+        /// <summary>
+        /// Gets or sets property that contains the rent for the current apartments.
+        /// </summary>
+        public float Rent { get; set; }
 
         /// <summary>
         /// Gets or sets property that contains resident who lives in this apartments.
@@ -26,12 +41,23 @@ namespace ApartmentBuilding.API.Requests
         public int? ResidentID { get; set; }
 
         /// <summary>
-        /// Represents FlatRequest as Flat.
+        /// Validate current object.
         /// </summary>
-        /// <returns>Flat.</returns>
-        public Flat ToModel()
+        /// <returns>True if object passed validation.</returns>
+        public bool Validate()
         {
-            return new Flat(default, this.FloorArea, this.ResidentID);
+            var result = this.validator.Validate(this);
+            if (result.IsValid)
+            {
+                return true;
+            }
+
+            foreach (var error in result.Errors)
+            {
+                Console.WriteLine(error.ErrorMessage);
+            }
+
+            return false;
         }
     }
 }
