@@ -7,6 +7,7 @@ namespace ApartmentBuilding.API
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using ApartmentBuilding.API;
     using ApartmentBuilding.Core.Models;
@@ -22,6 +23,7 @@ namespace ApartmentBuilding.API
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.IdentityModel.Tokens;
     using Microsoft.OpenApi.Models;
 
     /// <summary>
@@ -52,12 +54,33 @@ namespace ApartmentBuilding.API
             services.AddScoped<IRepository<Flat>, SQLApartmentRepository>();
             services.AddScoped<IRepository<Resident>, SQLResidentRepository>();
             services.AddAutoMapper(typeof(Startup));
-            services.AddControllersWithViews();
-            services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FlatHouse", Version = "v1" });
             });
+
+            services.AddAuthentication(auth =>
+            {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = this.Configuration["AuthSettings:Audience"],
+                    ValidIssuer = this.Configuration["AuthSettings:Issuer"],
+                    RequireExpirationTime = true,
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(this.Configuration["AuthSettings:key"])),
+                    ValidateIssuerSigningKey = true,
+                };
+            });
+
+            services.AddControllersWithViews();
+            services.AddControllers();
         }
 
         /// <summary>
@@ -74,12 +97,11 @@ namespace ApartmentBuilding.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FlatHouse v1"));
             }
 
-            app.UseHttpsRedirection();
-
-            // app.UseStaticFiles();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints =>
             {

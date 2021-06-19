@@ -9,16 +9,20 @@ namespace ApartmentBuilding.API.Controllers
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Security.Claims;
+    using System.Text;
     using System.Threading.Tasks;
+    using ApartmentBuilding.API.Authentication;
     using ApartmentBuilding.API.Requests;
     using ApartmentBuilding.API.Responses;
     using ApartmentBuilding.Core.Models;
     using ApartmentBuilding.Core.Repositories;
     using ApartmentBuilding.Data;
     using AutoMapper;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
 
     /// <summary>
@@ -30,22 +34,26 @@ namespace ApartmentBuilding.API.Controllers
     {
         private readonly IRepository<Resident> repository;
         private readonly IMapper mapper;
+        private readonly IConfiguration configuration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResidentsController"/> class.
         /// </summary>
         /// <param name="repository">repo param.</param>
-        /// /// <param name="mapper">mapper param?.</param>
-        public ResidentsController(IRepository<Resident> repository, IMapper mapper)
+        /// <param name="mapper">mapper param.</param>
+        /// /// <param name="configuration">configuration param.</param>
+        public ResidentsController(IRepository<Resident> repository, IMapper mapper, IConfiguration configuration)
         {
             this.repository = repository;
             this.mapper = mapper;
+            this.configuration = configuration;
         }
 
         /// <summary>
         /// Returns collection of the residents from the repository.
         /// </summary>
         /// <returns>List of the residents.</returns>
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -59,7 +67,6 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of resident.</param>
         /// <returns>Resident.</returns>
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -73,7 +80,7 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="resident">Resident.</param>
         /// <returns>Sucess of the operation.</returns>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ResidentRequest resident)
+        public async Task<IActionResult> Post([FromForm] ResidentRequest resident)
         {
             if (resident.Validate())
             {
@@ -114,60 +121,52 @@ namespace ApartmentBuilding.API.Controllers
         }
 
         /// <summary>
-        /// Token.
+        /// Returns jwt token.
         /// </summary>
-        /// <param name="id">Resident id.</param>
-        /// <returns>IActionResult.</returns>
-        //[HttpPost("/token")]
-        //public async Task<IActionResult> Token(int id)
-        //{
-        //    var identity = await this.GetIdentity(id);
-        //    if (identity == null)
-        //    {
-        //        return this.BadRequest(new { errorText = "Invalid resident." });
-        //    }
+        /// <param name="resident">Resident.</param>
+        /// <returns>Token.</returns>
+        [HttpPost("/token")]
+        public async Task<IActionResult> Token([FromBody]AuthenticateResidentRequest resident)
+        {
+            var claims = await this.GetIdentity(resident);
+            if (claims == null)
+            {
+                return this.BadRequest(new { errorText = "Invalid ID or password" });
+            }
 
-        //    var now = DateTime.UtcNow;
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["AuthSettings:key"]));
+            var jwt = new JwtSecurityToken(
+                issuer: this.configuration["AuthSettings:Issuer"],
+                audience: this.configuration["AuthSettings:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddDays(30),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
+            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-        //    var jwt = new JwtSecurityToken(
-        //        issuer: AuthOptions.Issuer,
-        //        audience: AuthOptions.Audience,
-        //        notBefore: now,
-        //        claims: identity.Claims,
-        //        expires: now.Add(TimeSpan.FromMinutes(AuthOptions.Lifetime)),
-        //        signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-        //    var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var response = new
+            {
+                access_token = encodedJwt,
+            };
 
-        //    var response = new
-        //    {
-        //        access_token = encodedJwt,
-        //        username = identity.Name,
-        //    };
+            return new JsonResult(response);
+        }
 
-        //    return new JsonResult(response);
-        //}
+        private async Task<List<Claim>> GetIdentity(AuthenticateResidentRequest resident)
+        {
+            var r = await this.repository.GetByID(resident.ID);
+            if (r != null)
+            {
+                if (r.Password == resident.Password)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, resident.ID.ToString()),
+                    };
+                    return claims;
+                }
+            }
 
-        /// <summary>
-        /// Returns identity.
-        /// </summary>
-        /// <param name="id">id of the resident.</param>
-        /// <returns>ClaimsIdentity of the resident.</returns>
-        //public async Task<ClaimsIdentity> GetIdentity(int id)
-        //{
-        //    Resident resident = await this.repository.GetByID(id);
-        //    if (resident != null)
-        //    {
-        //        var claims = new List<Claim>
-        //        {
-        //            new Claim(ClaimsIdentity.DefaultNameClaimType, resident.Name),
-        //            new Claim(ClaimValueTypes.Integer32, resident.ID.ToString()),
-        //        };
-        //        ClaimsIdentity claimsIdentity =
-        //        new ClaimsIdentity(claims, "Token");
-        //        return claimsIdentity;
-        //    }
-
-        //    return null;
-        //}
+            return null;
+        }
     }
 }

@@ -93,10 +93,17 @@ namespace ApartmentBuilding.Data
         {
             using (var connection = new MySqlConnection(this.provider))
             {
-                var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
-                var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
-                result.Flats = flatsResult.ToList();
-                return result;
+                try
+                {
+                    var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
+                    var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
+                    result.Flats = flatsResult.ToList();
+                    return result;
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
 
