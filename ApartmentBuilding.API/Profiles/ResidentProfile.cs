@@ -23,7 +23,8 @@ namespace ApartmentBuilding.API.Profiles
         /// </summary>
         public ResidentProfile()
         {
-            this.CreateMap<ResidentRequest, Resident>();
+            this.CreateMap<ResidentRequest, Resident>()
+                .ForMember("Role", opt => opt.MapFrom(c => ResidentRole.Citizen));
             this.CreateMap<Resident, ResidentResponse>();
         }
     }

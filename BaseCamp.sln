@@ -11,9 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\..\StyleCopRules.ruleset = ..\..\StyleCopRules.ruleset
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuilding.Core", "ApartmentBuilding.Core\ApartmentBuilding.Core.csproj", "{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApartmentBuilding.Core", "ApartmentBuilding.Core\ApartmentBuilding.Core.csproj", "{87A024B9-C7E4-4502-A4EA-8879B4DEC32D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuilding.Data", "ApartmentBuilding.Data\ApartmentBuilding.Data.csproj", "{8E7BD049-1753-4E8E-9902-31FA004113DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApartmentBuilding.Data", "ApartmentBuilding.Data\ApartmentBuilding.Data.csproj", "{8E7BD049-1753-4E8E-9902-31FA004113DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApartmentBuilding.Tests", "ApartmentBuilding.Tests\ApartmentBuilding.Tests.csproj", "{F75753AC-BA99-475B-8E23-6E5502EB5437}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E7BD049-1753-4E8E-9902-31FA004113DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F75753AC-BA99-475B-8E23-6E5502EB5437}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F75753AC-BA99-475B-8E23-6E5502EB5437}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F75753AC-BA99-475B-8E23-6E5502EB5437}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F75753AC-BA99-475B-8E23-6E5502EB5437}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

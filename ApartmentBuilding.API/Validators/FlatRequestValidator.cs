@@ -1,4 +1,4 @@
-﻿// <copyright file="FlatValidator.cs" company="PlaceholderCompany">
+﻿// <copyright file="FlatRequestValidator.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 

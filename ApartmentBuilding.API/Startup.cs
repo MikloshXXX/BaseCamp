@@ -69,8 +69,8 @@ namespace ApartmentBuilding.API
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidAudience = this.Configuration["AuthSettings:Audience"],
                     ValidIssuer = this.Configuration["AuthSettings:Issuer"],
+                    ValidAudience = this.Configuration["AuthSettings:Audience"],
                     RequireExpirationTime = true,
                     IssuerSigningKey =
                         new SymmetricSecurityKey(
@@ -97,7 +97,12 @@ namespace ApartmentBuilding.API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FlatHouse v1"));
             }
 
+            app.UseStatusCodePages();
             app.UseRouting();
+            app.UseCors(x => x
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
             app.UseAuthentication();
             app.UseAuthorization();
 

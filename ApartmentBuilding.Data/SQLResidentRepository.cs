@@ -32,7 +32,7 @@ namespace ApartmentBuilding.Data
             {
                 using (var connection = new MySqlConnection(this.provider))
                 {
-                    var result = await connection.ExecuteAsync($"INSERT INTO `residents`(`Name`, `Password`) VALUES ('{entity.Name}','{entity.Password}')");
+                    var result = await connection.ExecuteAsync($"INSERT INTO `residents`(`Name`, `Password`, `Role`) VALUES ('{entity.Name}','{entity.Password}',{(int)ResidentRole.Citizen})");
                 }
 
                 return true;

@@ -11,7 +11,6 @@ namespace ApartmentBuilding.API.Controllers
     using System.Security.Claims;
     using System.Text;
     using System.Threading.Tasks;
-    using ApartmentBuilding.API.Authentication;
     using ApartmentBuilding.API.Requests;
     using ApartmentBuilding.API.Responses;
     using ApartmentBuilding.Core.Models;
@@ -53,7 +52,7 @@ namespace ApartmentBuilding.API.Controllers
         /// Returns collection of the residents from the repository.
         /// </summary>
         /// <returns>List of the residents.</returns>
-        [Authorize]
+        [Authorize(Roles = "Administator")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -67,6 +66,7 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of resident.</param>
         /// <returns>Resident.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -79,8 +79,9 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="resident">Resident.</param>
         /// <returns>Sucess of the operation.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] ResidentRequest resident)
+        public async Task<IActionResult> Post([FromBody] ResidentRequest resident)
         {
             if (resident.Validate())
             {
@@ -97,6 +98,7 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="id">ID of updating resident entity.</param>
         /// <param name="resident">New resident.</param>
         /// <returns>Sucess of the operation.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ResidentRequest resident)
         {
@@ -114,6 +116,7 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of deleting resident.</param>
         /// <returns>Sucess of the operation.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -125,20 +128,21 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="resident">Resident.</param>
         /// <returns>Token.</returns>
-        [HttpPost("/token")]
+        [HttpPost]
+        [Route("token")]
         public async Task<IActionResult> Token([FromBody]AuthenticateResidentRequest resident)
         {
-            var claims = await this.GetIdentity(resident);
-            if (claims == null)
+            var identity = await this.GetIdentity(resident);
+            if (identity == null)
             {
-                return this.BadRequest(new { errorText = "Invalid ID or password" });
+                return this.BadRequest();
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["AuthSettings:key"]));
             var jwt = new JwtSecurityToken(
                 issuer: this.configuration["AuthSettings:Issuer"],
                 audience: this.configuration["AuthSettings:Audience"],
-                claims: claims,
+                claims: identity.Claims,
                 expires: DateTime.Now.AddDays(30),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
@@ -151,7 +155,7 @@ namespace ApartmentBuilding.API.Controllers
             return new JsonResult(response);
         }
 
-        private async Task<List<Claim>> GetIdentity(AuthenticateResidentRequest resident)
+        private async Task<ClaimsIdentity> GetIdentity(AuthenticateResidentRequest resident)
         {
             var r = await this.repository.GetByID(resident.ID);
             if (r != null)
@@ -160,9 +164,12 @@ namespace ApartmentBuilding.API.Controllers
                 {
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.NameIdentifier, resident.ID.ToString()),
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, r.ID.ToString()),
+                        new Claim(ClaimsIdentity.DefaultRoleClaimType, r.Role.ToString()),
                     };
-                    return claims;
+                    ClaimsIdentity claimsIdentity =
+                        new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                    return claimsIdentity;
                 }
             }
 

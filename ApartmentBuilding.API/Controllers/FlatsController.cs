@@ -13,6 +13,7 @@ namespace ApartmentBuilding.API.Controllers
     using ApartmentBuilding.Core.Models;
     using ApartmentBuilding.Core.Repositories;
     using AutoMapper;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
@@ -41,6 +42,7 @@ namespace ApartmentBuilding.API.Controllers
         /// Returs a whole collection of apartments from repository.
         /// </summary>
         /// <returns>List of apartments.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -54,6 +56,7 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of the apartment.</param>
         /// <returns>Apartment.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -66,6 +69,7 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="flat">Apartment.</param>
         /// <returns>Sucess of the operation.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] FlatRequest flat)
         {
@@ -84,6 +88,7 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="id">ID of the updating apartment.</param>
         /// <param name="flat">New apartment.</param>
         /// <returns>Sucess of the opartion.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] FlatRequest flat)
         {
@@ -101,6 +106,7 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of the deleting apartment.</param>
         /// <returns>Sucess of the operation.</returns>
+        [Authorize(Roles = "Administator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

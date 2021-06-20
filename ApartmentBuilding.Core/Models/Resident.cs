@@ -20,12 +20,13 @@ namespace ApartmentBuilding.Core.Models
         /// <param name="iD">Resident's ID.</param>
         /// <param name="name">Resident's name.</param>
         /// <param name="flats">List of flats where the resident lives.</param>
-        public Resident(int iD = 0, string name = "", string password = "")
+        public Resident(int iD = 0, string name = "", string password = "", ResidentRole role = ResidentRole.Citizen)
         {
             this.ID = iD;
             this.Name = name;
             this.Password = password;
             this.Flats = new List<Flat>();
+            this.Role = role;
         }
 
         /// <summary>
@@ -43,9 +44,14 @@ namespace ApartmentBuilding.Core.Models
         /// </summary>
         public string Password { get; set; }
 
-        ///// <summary>
-        ///// Gets or sets property that contains all apartments where resident lives.
-        ///// </summary>
+        /// <summary>
+        /// Gets or sets property that contains all apartments where resident lives.
+        /// </summary>
         public List<Flat> Flats { get; set; }
+
+        /// <summary>
+        /// Gets or sets property that contains the role of the resident.
+        /// </summary>
+        public ResidentRole Role { get; set; }
     }
 }
