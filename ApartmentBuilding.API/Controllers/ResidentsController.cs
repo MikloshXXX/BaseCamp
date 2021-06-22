@@ -57,8 +57,13 @@ namespace ApartmentBuilding.API.Controllers
         public async Task<IActionResult> Get()
         {
             var models = await this.repository.Get();
-            var result = models.ToList().Select(_ => this.mapper.Map<ResidentResponse>(_));
-            return this.Ok(result.ToList());
+            if (models != null)
+            {
+                var result = models.ToList().Select(_ => this.mapper.Map<ResidentResponse>(_));
+                return this.Ok(result.ToList());
+            }
+
+            return this.NoContent();
         }
 
         /// <summary>
@@ -71,7 +76,12 @@ namespace ApartmentBuilding.API.Controllers
         public async Task<IActionResult> Get(int id)
         {
             var result = await this.repository.GetByID(id);
-            return this.Ok(this.mapper.Map<ResidentResponse>(result));
+            if (result != null)
+            {
+                return this.Ok(this.mapper.Map<ResidentResponse>(result));
+            }
+
+            return this.NoContent();
         }
 
         /// <summary>
@@ -89,7 +99,7 @@ namespace ApartmentBuilding.API.Controllers
                 return this.Ok(await this.repository.Create(model));
             }
 
-            return this.ValidationProblem();
+            return this.BadRequest();
         }
 
         /// <summary>
@@ -108,7 +118,7 @@ namespace ApartmentBuilding.API.Controllers
                 return this.Ok(await this.repository.Update(id, model));
             }
 
-            return this.ValidationProblem();
+            return this.BadRequest();
         }
 
         /// <summary>

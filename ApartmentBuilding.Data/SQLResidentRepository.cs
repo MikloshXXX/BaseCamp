@@ -71,16 +71,23 @@ namespace ApartmentBuilding.Data
         /// <returns>List of residents.</returns>
         public async Task<IEnumerable<Resident>> Get()
         {
-            using (var connection = new MySqlConnection(this.provider))
+            try
             {
-                var result = await connection.QueryAsync<Resident>("SELECT * FROM `residents`");
-                foreach (Resident r in result.ToList())
+                using (var connection = new MySqlConnection(this.provider))
                 {
-                    var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {r.ID}");
-                    r.Flats = flatsResult.ToList();
-                }
+                    var result = await connection.QueryAsync<Resident>("SELECT * FROM `residents`");
+                    foreach (Resident r in result.ToList())
+                    {
+                        var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {r.ID}");
+                        r.Flats = flatsResult.ToList();
+                    }
 
-                return result;
+                    return result;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -91,19 +98,26 @@ namespace ApartmentBuilding.Data
         /// <returns>Resident entity.</returns>
         public async Task<Resident> GetByID(int id)
         {
-            using (var connection = new MySqlConnection(this.provider))
+            try
             {
-                try
+                using (var connection = new MySqlConnection(this.provider))
                 {
-                    var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
-                    var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
-                    result.Flats = flatsResult.ToList();
-                    return result;
+                    try
+                    {
+                        var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
+                        var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
+                        result.Flats = flatsResult.ToList();
+                        return result;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
                 }
-                catch
-                {
-                    return null;
-                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
