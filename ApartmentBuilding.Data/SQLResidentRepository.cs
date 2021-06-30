@@ -17,7 +17,7 @@ namespace ApartmentBuilding.Data
     /// <summary>
     /// Class that implements the repository interface for working with residents SQL.
     /// </summary>
-    public class SQLResidentRepository : IRepository<Resident>
+    public class SQLResidentRepository : IResidentRepository<Resident>
     {
         private string provider = "server=localhost;port=3306;user=root;password=root;database=apartmentbuild";
 
@@ -102,17 +102,10 @@ namespace ApartmentBuilding.Data
             {
                 using (var connection = new MySqlConnection(this.provider))
                 {
-                    try
-                    {
-                        var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
-                        var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
-                        result.Flats = flatsResult.ToList();
-                        return result;
-                    }
-                    catch
-                    {
-                        return null;
-                    }
+                    var result = await connection.QuerySingleAsync<Resident>($"SELECT * FROM `residents` WHERE ID = {id}");
+                    var flatsResult = await connection.QueryAsync<Flat>($"SELECT * FROM `apartments` WHERE ResidentID = {result.ID}");
+                    result.Flats = flatsResult.ToList();
+                    return result;
                 }
             }
             catch
@@ -126,7 +119,7 @@ namespace ApartmentBuilding.Data
         /// </summary>
         /// <param name="id">ID of updating resident.</param>
         /// <param name="entity">New resident.</param>
-        /// <returns>Success of the opeation.</returns>
+        /// <returns>Success of the operation.</returns>
         public async Task<bool> Update(int id, Resident entity)
         {
             try
@@ -138,6 +131,36 @@ namespace ApartmentBuilding.Data
 
                 return true;
             }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates refresh token and expiry time of the resident.
+        /// </summary>
+        /// <param name="id">ID.</param>
+        /// <param name="refreshToken">RefreshToken.</param>
+        /// <param name="expiryTime">RefreshToken expiry time.</param>
+        /// <returns>Success of the operation.</returns>
+        public async Task<bool> UpdateRefreshToken(int id, string refreshToken, DateTime? expiryTime = null)
+        {
+            try
+            {
+                using (var connection = new MySqlConnection(this.provider))
+                {
+                    if (expiryTime != null)
+                    {
+                        string sqlFormattedDate = expiryTime.Value.ToString("yyyy-MM-dd HH:mm:ss.fff");
+                        await connection.ExecuteAsync($"UPDATE `residents` SET `refreshToken`= '{refreshToken}', `refreshTokenExpiryTime` = '{sqlFormattedDate}' WHERE ID = {id}");
+                    }
+
+                    await connection.ExecuteAsync($"UPDATE `residents` SET `refreshToken`= '{refreshToken}' WHERE ID = {id}");
+                }
+
+                return true;
+        }
             catch
             {
                 return false;
