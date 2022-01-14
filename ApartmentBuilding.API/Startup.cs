@@ -10,6 +10,7 @@ namespace ApartmentBuilding.API
     using System.Text;
     using System.Threading.Tasks;
     using ApartmentBuilding.API;
+    using ApartmentBuilding.API.Controllers;
     using ApartmentBuilding.Core.Models;
     using ApartmentBuilding.Core.Repositories;
     using ApartmentBuilding.Data;
@@ -52,7 +53,9 @@ namespace ApartmentBuilding.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IRepository<Flat>, SQLApartmentRepository>();
-            services.AddScoped<IRepository<Resident>, SQLResidentRepository>();
+            services.AddScoped<IResidentRepository<Resident>, SQLResidentRepository>();
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddTransient<IIdentityNameService, IdentityNameService>();
             services.AddAutoMapper(typeof(Startup));
             services.AddSwaggerGen(c =>
             {
@@ -69,13 +72,15 @@ namespace ApartmentBuilding.API
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuer = this.Configuration["AuthSettings:Issuer"],
-                    ValidAudience = this.Configuration["AuthSettings:Audience"],
+                    ValidIssuer = "http://localhost:5000",
+                    ValidAudience = "http://localhost:5000",
                     RequireExpirationTime = true,
                     IssuerSigningKey =
                         new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(this.Configuration["AuthSettings:key"])),
+                            Encoding.UTF8.GetBytes("superSecretKey@345")),
                     ValidateIssuerSigningKey = true,
+
+                    // ClockSkew = TimeSpan.Zero,
                 };
             });
 

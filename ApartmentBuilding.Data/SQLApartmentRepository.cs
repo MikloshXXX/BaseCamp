@@ -79,10 +79,17 @@ namespace ApartmentBuilding.Data
         /// <returns>Collection of apartments in the database.</returns>
         public async Task<IEnumerable<Flat>> Get()
         {
-            using (var connection = new MySqlConnection(this.provider))
+            try
             {
-                var result = await connection.QueryAsync<Flat>("SELECT * FROM apartments");
-                return result;
+                using (var connection = new MySqlConnection(this.provider))
+                {
+                    var result = await connection.QueryAsync<Flat>("SELECT * FROM apartments");
+                    return result;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 
@@ -93,10 +100,17 @@ namespace ApartmentBuilding.Data
         /// <returns>Flat.</returns>
         public async Task<Flat> GetByID(int id)
         {
-            using (var connection = new MySqlConnection(this.provider))
+            try
             {
-                var result = await connection.QuerySingleAsync<Flat>($"SELECT * FROM apartments WHERE ApartmentNumber = {id}");
-                return result;
+                using (var connection = new MySqlConnection(this.provider))
+                {
+                    var result = await connection.QuerySingleAsync<Flat>($"SELECT * FROM apartments WHERE ApartmentNumber = {id}");
+                    return result;
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
 

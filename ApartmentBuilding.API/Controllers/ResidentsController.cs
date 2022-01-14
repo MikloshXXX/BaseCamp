@@ -9,6 +9,7 @@ namespace ApartmentBuilding.API.Controllers
     using System.IdentityModel.Tokens.Jwt;
     using System.Linq;
     using System.Security.Claims;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;
     using ApartmentBuilding.API.Requests;
@@ -31,28 +32,29 @@ namespace ApartmentBuilding.API.Controllers
     [ApiController]
     public class ResidentsController : ControllerBase
     {
-        private readonly IRepository<Resident> repository;
+        private readonly IResidentRepository<Resident> repository;
         private readonly IMapper mapper;
-        private readonly IConfiguration configuration;
+        private readonly IIdentityNameService identity;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResidentsController"/> class.
         /// </summary>
         /// <param name="repository">repo param.</param>
         /// <param name="mapper">mapper param.</param>
-        /// /// <param name="configuration">configuration param.</param>
-        public ResidentsController(IRepository<Resident> repository, IMapper mapper, IConfiguration configuration)
+        /// <param name="configuration">configuration param.</param>
+        /// <param name="identity">identity param.</param>
+        public ResidentsController(IResidentRepository<Resident> repository, IMapper mapper, IConfiguration configuration, IIdentityNameService identity)
         {
             this.repository = repository;
             this.mapper = mapper;
-            this.configuration = configuration;
+            this.identity = identity;
         }
 
         /// <summary>
         /// Returns collection of the residents from the repository.
         /// </summary>
         /// <returns>List of the residents.</returns>
-        [Authorize(Roles = "Administator")]
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -70,18 +72,23 @@ namespace ApartmentBuilding.API.Controllers
         /// Returns specific resident entity from the repository.
         /// </summary>
         /// <param name="id">ID of resident.</param>
-        /// <returns>Resident.</returns>
-        [Authorize(Roles = "Administator")]
+        /// <returns>Resident by id.</returns>
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await this.repository.GetByID(id);
-            if (result != null)
+            if (this.identity.GetIdentityName(this.HttpContext) == id.ToString())
             {
-                return this.Ok(this.mapper.Map<ResidentResponse>(result));
+                var result = await this.repository.GetByID(id);
+                if (result != null)
+                {
+                    return this.Ok(this.mapper.Map<ResidentResponse>(result));
+                }
+
+                return this.NoContent();
             }
 
-            return this.NoContent();
+            return this.Forbid();
         }
 
         /// <summary>
@@ -89,17 +96,23 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="resident">Resident.</param>
         /// <returns>Sucess of the operation.</returns>
-        [Authorize(Roles = "Administator")]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ResidentRequest resident)
+        public async Task<IActionResult> Register([FromBody] ResidentRequest resident)
         {
             if (resident.Validate())
             {
                 var model = this.mapper.Map<Resident>(resident);
-                return this.Ok(await this.repository.Create(model));
+                bool result = await this.repository.Create(model);
+                if (result)
+                {
+                    return this.Ok(result);
+                }
+
+                return this.BadRequest(new { errorText = "Resident was not created" });
             }
 
-            return this.BadRequest();
+            return this.BadRequest(new { errorText = "Validation problem" });
         }
 
         /// <summary>
@@ -108,17 +121,23 @@ namespace ApartmentBuilding.API.Controllers
         /// <param name="id">ID of updating resident entity.</param>
         /// <param name="resident">New resident.</param>
         /// <returns>Sucess of the operation.</returns>
-        [Authorize(Roles = "Administator")]
+        [Authorize(Roles = "Administrator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] ResidentRequest resident)
         {
             if (resident.Validate())
             {
                 var model = this.mapper.Map<Resident>(resident);
-                return this.Ok(await this.repository.Update(id, model));
+                bool result = await this.repository.Update(id, model);
+                if (result)
+                {
+                    return this.Ok(result);
+                }
+
+                return this.BadRequest(new { errorText = "Resident was not changed" });
             }
 
-            return this.BadRequest();
+            return this.BadRequest(new { errorText = "Validation problem" });
         }
 
         /// <summary>
@@ -126,64 +145,17 @@ namespace ApartmentBuilding.API.Controllers
         /// </summary>
         /// <param name="id">ID of deleting resident.</param>
         /// <returns>Sucess of the operation.</returns>
-        [Authorize(Roles = "Administator")]
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            return this.Ok(await this.repository.Delete(id));
-        }
-
-        /// <summary>
-        /// Returns jwt token.
-        /// </summary>
-        /// <param name="resident">Resident.</param>
-        /// <returns>Token.</returns>
-        [HttpPost]
-        [Route("token")]
-        public async Task<IActionResult> Token([FromBody]AuthenticateResidentRequest resident)
-        {
-            var identity = await this.GetIdentity(resident);
-            if (identity == null)
+            bool result = await this.repository.Delete(id);
+            if (result)
             {
-                return this.BadRequest();
+                return this.Ok(result);
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["AuthSettings:key"]));
-            var jwt = new JwtSecurityToken(
-                issuer: this.configuration["AuthSettings:Issuer"],
-                audience: this.configuration["AuthSettings:Audience"],
-                claims: identity.Claims,
-                expires: DateTime.Now.AddDays(30),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256));
-            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            var response = new
-            {
-                access_token = encodedJwt,
-            };
-
-            return new JsonResult(response);
-        }
-
-        private async Task<ClaimsIdentity> GetIdentity(AuthenticateResidentRequest resident)
-        {
-            var r = await this.repository.GetByID(resident.ID);
-            if (r != null)
-            {
-                if (r.Password == resident.Password)
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, r.ID.ToString()),
-                        new Claim(ClaimsIdentity.DefaultRoleClaimType, r.Role.ToString()),
-                    };
-                    ClaimsIdentity claimsIdentity =
-                        new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-                    return claimsIdentity;
-                }
-            }
-
-            return null;
+            return this.BadRequest(new { errorText = "Resident was not deleted" });
         }
     }
 }

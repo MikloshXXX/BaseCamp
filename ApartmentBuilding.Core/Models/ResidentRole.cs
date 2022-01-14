@@ -9,6 +9,6 @@ namespace ApartmentBuilding.Core.Models
     public enum ResidentRole
     {
         Citizen,
-        Administator
+        Administrator
     }
 }
